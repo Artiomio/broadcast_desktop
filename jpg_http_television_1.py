@@ -16,8 +16,10 @@ def hello_world():
     return "Thank you!"
 
 
+
 if __name__ == "__main__":
-    threading.Thread(target=app.run, args=["0", 7893]).start()
+    port = 7893
+    threading.Thread(target=app.run, args=["0", port]).start()
     img  = None
     
     i = 0
