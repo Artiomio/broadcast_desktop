@@ -6,7 +6,7 @@ import requests
 
 
 
-SCREEN_GRAB_RANGE = {"top": 0, "left": 0, "width": 1280, "height": 1024}
+SCREEN_GRAB_RANGE = {"top": 0, "left": 0, "width": 1366, "height": 768}
 sct = mss.mss()
 
 def get_screenshot(sct):
@@ -25,6 +25,19 @@ def get_screenshot(sct):
 
 
 
+def send_to_artmonitor(img, secret="wubuku", jpg_quality=30, monitor_url="https://artmonitor.pythonanywhere.com"):
+    url=f'{monitor_url}/{secret}/postimage/'
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), jpg_quality]
+    result, encimg_jpg = cv2.imencode('.jpg', img, encode_param)
+    jpg_bytes = encimg_jpg.tobytes()
+    print(f"!!!Broadcasting desktop!!!\nSending POST request: {len(jpg_bytes)} bytes {monitor_url}")
+    start = time.time()
+    res = requests.post(url,
+                        data=jpg_bytes,
+                        headers={'Content-Type': 'application/octet-stream'})
+
+    print(f"Response: {res}\nReady: {len(jpg_bytes)} bytes sent in {time.time() - start} sec")
+
 
 
 
@@ -32,15 +45,7 @@ while True:
 
 
     img = get_screenshot(sct)
-    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 30]
-    result, encimg_jpg = cv2.imencode('.jpg', img, encode_param)
-    jpg_bytes = encimg_jpg.tobytes()
-
-    res = requests.post(url='http://188.243.172.35/uploadjpg',
-                        data=jpg_bytes,
-                        headers={'Content-Type': 'application/octet-stream'})
-    
-
+    send_to_artmonitor(img)
 
 
 
@@ -50,7 +55,7 @@ while True:
         print("Нажали Esc, выхожу из цикла")
         break
 
-    time.sleep(2)
+    time.sleep(1)
 
 cv2.destroyAllWindows()
 
